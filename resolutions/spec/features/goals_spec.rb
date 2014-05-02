@@ -7,6 +7,13 @@ def sign_up_as_dwac
   click_button 'Sign Up'
 end
 
+def sign_up_as_pikachu
+  visit new_user_url
+  fill_in 'Username', with: "pikachu"
+  fill_in 'Password', with: "pikapika"
+  click_button 'Sign Up'
+end
+
 def sign_in_as_dwac
   visit new_session_url
   fill_in 'Username', with: "cats"
@@ -24,7 +31,6 @@ def make_public_goal
   choose('Public')
   click_button('Make New Goal')
 end
-
 
 def make_private_goal
   visit new_goal_url
@@ -52,67 +58,129 @@ feature "the goal creation process" do
       expect(page).to have_content 'New Goal'
     end
 
-    it "shows new goal page after index" do
+    it "shows link to new goal page on goal index page" do
       visit goals_url
       click_link "Create New Goal"
-      expect(page).to have_content "Username can't be blank"
+      expect(page).to have_content 'Create New Goal'
+      expect(page).to have_content 'Title'
+      expect(page).to have_content 'Private'
+      expect(page).to have_content 'Public'
     end
 
-    it "shows error if sign up without password" do
-      visit new_user_url
-      fill_in "Username", with: "cats"
-      click_button "Sign Up"
-      expect(page).to have_content "Password can't be blank"
+    it "makes new goals and lists them on index page" do
+      make_public_goal
+      visit goals_url
+      expect(page).to have_content 'Become a Pokemon master!'
     end
 
-    it "shows error if sign up with short password" do
-      visit new_user_url
-      fill_in "Password", with: "are"
-      click_button "Sign Up"
-      expect(page).to have_content "Password is too short (minimum is 6 characters)"
+    it "makes new goals and lists them on index page publically" do
+      make_public_goal
+      log_out
+      sign_up_as_pikachu
+      visit goals_url
+      expect(page).to have_content 'Become a Pokemon master!'
+    end
+
+    it "makes new private goals visible to self" do
+      make_private_goal
+      visit goals_url
+      expect(page).to have_content 'Kill Pikachu!'
+    end
+
+    it "makes new private goals invisible to other users" do
+      make_private_goal
+      log_out
+      sign_up_as_pikachu
+      visit goals_url
+      expect(page).to_not have_content 'Kill Pikachu!'
     end
   end
 end
 
-feature "logging in" do
-  before :each do
+feature "the read goals process" do
+
+  it "displays the comments of all the public goals" do
     sign_up_as_dwac
-    log_out
-  end
-
-  it "shows login page" do
-    expect(page).to have_content 'Sign In'
-    expect(page).to have_content 'Username'
-    expect(page).to have_content 'Password'
-  end
-
-  it "shows username on the homepage after login" do
-    sign_in_as_dwac
-
-    expect(page).to have_content 'cats'
-    expect(page).to have_button 'Sign Out'
+    make_public_goal
+    click_link 'Become a Pokemon master!'
   end
 
 end
 
-feature "logging out" do
-  before :each do
+feature "the update goals process" do
+
+  it "updates the title of the link of the logged in user" do
     sign_up_as_dwac
-    log_out
+    make_public_goal
+    click_link 'Become a Pokemon master!'
+    click_link 'Edit'
+    fill_in "Title", :with => 'To Kill David'
+    click_button 'Edit Goal'
+    click_link "Goals"
+    expect(page).to have_content "To Kill David"
   end
 
-  it "begins with logged out state" do
-    expect(page).to have_content 'Sign In'
-    expect(page).to have_content 'Username'
-    expect(page).to have_content 'Password'
+  it "updates a goal the logged in user" do
+    sign_up_as_dwac
+    make_public_goal
+    click_link 'Become a Pokemon master!'
+    click_link 'Edit'
+    choose('Private')
+    click_button 'Edit Goal'
+    expect(page).to have_content "private"
   end
-
-  it "doesn't show username on the homepage after logout" do
-    expect(page).to_not have_content 'cats'
-  end
-
-  it "doesn't show logout button on homepage after logout" do
-    expect(page).not_to have_button 'Sign Out'
-  end
-
 end
+
+feature "the delete goals process"
+  it "deletes a goal of the logged in user" do
+    sign_up_as_dwac
+    make_public_goal
+    click_link 'Become a Pokemon master!'
+    click_button 'Delete'
+    expect(page).not_to have_content 'Become a Pokemon master!'
+  end
+end
+#CRUD Create Read Update Delete
+#
+# feature "logging in" do
+#   before :each do
+#     sign_up_as_dwac
+#     log_out
+#   end
+#
+#   it "shows login page" do
+#     expect(page).to have_content 'Sign In'
+#     expect(page).to have_content 'Username'
+#     expect(page).to have_content 'Password'
+#   end
+#
+#   it "shows username on the homepage after login" do
+#     sign_in_as_dwac
+#
+#     expect(page).to have_content 'cats'
+#     expect(page).to have_button 'Sign Out'
+#   end
+#
+# end
+#
+# feature "logging out" do
+#   before :each do
+#     sign_up_as_dwac
+#     log_out
+#   end
+#
+#   it "begins with logged out state" do
+#     expect(page).to have_content 'Sign In'
+#     expect(page).to have_content 'Username'
+#     expect(page).to have_content 'Password'
+#   end
+#
+#   it "doesn't show username on the homepage after logout" do
+#     expect(page).to_not have_content 'cats'
+#   end
+#
+#   it "doesn't show logout button on homepage after logout" do
+#     expect(page).not_to have_button 'Sign Out'
+#   end
+#
+# end
