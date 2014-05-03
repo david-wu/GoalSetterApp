@@ -24,8 +24,8 @@
         <td><%= goal.title %></td>
         <td><%= goal.user_id %></td>
         <td><%= goal.access %></td>
-        <td><%= button_to goal.title, goal_url(goal) %></td>
-        <td><%= button_to 'Edit', edit_goal_path(goal) %></td>
+        <td><%= link_to goal.title, goal_url(goal) %></td>
+        <td><%= button_to 'Edit', edit_goal_url(goal) %></td>
         <td><%= button_to 'Delete', goal_url(goal.id), method: :delete %></td>
         <% end %>
       </tr>

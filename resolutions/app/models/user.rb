@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :integer          not null, primary key
+#  username        :string(255)      not null
+#  password_digest :string(255)      not null
+#  session_token   :string(255)      not null
+#  created_at      :datetime
+#  updated_at      :datetime
+#
+
 class User < ActiveRecord::Base
   attr_reader :password
 
@@ -6,6 +18,9 @@ class User < ActiveRecord::Base
   validates :password_digest, presence: { message: "Password can't be blank" }
   validates :session_token, presence: true
   validates :password, length: { minimum: 6, allow_nil: true }, on: :create
+
+
+  has_many :comments, as: :sayable
 
   def self.find_by_credentials(username, password)
     user = User.find_by_username(username)

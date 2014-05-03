@@ -131,15 +131,16 @@ feature "the update goals process" do
   end
 end
 
-feature "the delete goals process"
+feature "the delete goals process" do
   it "deletes a goal of the logged in user" do
     sign_up_as_dwac
     make_public_goal
-    click_link 'Become a Pokemon master!'
     click_button 'Delete'
     expect(page).not_to have_content 'Become a Pokemon master!'
   end
 end
+
+
 #CRUD Create Read Update Delete
 #
 # feature "logging in" do

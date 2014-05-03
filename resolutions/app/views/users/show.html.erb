@@ -1,0 +1,15 @@
+<h1>Show page for <%= @user.username %></h1>
+
+<%@comments.each do |comment|%>
+  <br><%=comment.body%>
+<%end%>
+<form action="<%= comments_url %>" method="post">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+  <input type="hidden" name="comment[sayable_type]" value="User">
+  <input type="hidden" name="comment[sayable_id]" value="<%= @user.id %>">
+  <label>Body<br>
+    <input type="text", name="comment[body]">
+  </label>
+  <br>
+  <input type="submit" value="Add Comment">
+</form>
